@@ -20,10 +20,20 @@
   },
   "homepage": "https://github.com/hannq/reptile#readme",
   "devDependencies": {
+    "@types/fs-extra": "^8.1.0",
+    "@types/json2csv": "^5.0.0",
+    "@types/micromatch": "^4.0.1",
+    "@types/node-xlsx": "^0.15.0",
     "@types/puppeteer": "^2.0.1",
+    "fs-extra": "^9.0.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "puppeteer": "^3.0.2"
+    "html-table-to-json": "^1.0.0",
+    "json2csv": "^5.0.1",
+    "micromatch": "^4.0.2",
+    "node-xlsx": "^0.15.0",
+    "puppeteer": "^3.0.2",
+    "tabletojson": "^2.0.4"
   }
 }
