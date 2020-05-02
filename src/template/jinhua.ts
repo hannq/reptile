@@ -2,7 +2,7 @@
  * @Author: hannq
  * @Date: 2020-04-29 00:09:34
  * @Last Modified by: hannq
- * @Last Modified time: 2020-05-02 23:45:23
+ * @Last Modified time: 2020-05-02 23:49:51
  * @desc 主入口文件
  */
 
@@ -32,6 +32,7 @@ const SOURCE_URL = 'http://www.jinhua.gov.cn/zjjh/jhnj/'
     await page.goto(source.target, {
       waitUntil: 'networkidle2'
     });
+    // TODO: 金华 2016 年及以前的数据需要点击 点击跳转 后才能正确展示
     const secondPage = await page.$$eval('table.MsoNormalTable tr', (trList: HTMLTableRowElement[]) => {
       return trList.reduce<{ title: string, content: { title: string, target: string }[]}[]>((acc, current, index) => {
         const subItems = Array.from(current.querySelectorAll('a'));
