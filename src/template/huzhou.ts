@@ -2,7 +2,7 @@
  * @Author: hannq
  * @Date: 2020-04-29 00:09:34
  * @Last Modified by: hannq
- * @Last Modified time: 2020-05-01 00:05:30
+ * @Last Modified time: 2020-05-02 23:28:16
  * @desc 主入口文件
  */
 
@@ -14,7 +14,7 @@ import fse from 'fs-extra';
 import { Tabletojson as tabletojson } from 'tabletojson';
 import xlsx from 'node-xlsx';
 
-const DATA_CACHE_PATH = path.join(__dirname, './data');
+const DATA_CACHE_PATH = path.join(__dirname, '../data');
 
 ;(async () => {
   const browser = await puppeteer.launch();
