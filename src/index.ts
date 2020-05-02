@@ -7,6 +7,7 @@
  */
 
 import puppeteer from 'puppeteer';
+import Fuse from 'fuse.js';
 import path from 'path';
 import micromatch from 'micromatch';
 import fse from 'fs-extra';
