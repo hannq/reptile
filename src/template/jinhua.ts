@@ -2,7 +2,7 @@
  * @Author: hannq
  * @Date: 2020-04-29 00:09:34
  * @Last Modified by: hannq
- * @Last Modified time: 2020-05-04 00:50:54
+ * @Last Modified time: 2020-05-04 20:15:35
  * @desc 主入口文件
  */
 
@@ -32,10 +32,9 @@ const SOURCE_URL = 'http://www.jinhua.gov.cn/zjjh/jhnj/'
       await page.goto(source.target, {
         waitUntil: 'networkidle2'
       });
-      const targetTable = await page.$('table.MsoNormalTable');
-      if (!!targetTable) {
-        // TODO: 金华 2016 年及以前的数据需要点击 点击跳转 后才能正确展示
-        const secondPage = await page.$$eval('table.MsoNormalTable tr', (trList: HTMLTableRowElement[]) => {
+      const targetTable = await page.$$('table.MsoNormalTable, table#Table1');
+      if (!!targetTable.length) {
+        const secondPage = await page.$$eval('table.MsoNormalTable tr, table#Table1 tr', (trList: HTMLTableRowElement[]) => {
           return trList.reduce<{ title: string, content: { title: string, target: string }[] }[]>((acc, current, index) => {
             const subItems = Array.from(current.querySelectorAll('a'));
             if (subItems.length) {
@@ -77,7 +76,15 @@ const SOURCE_URL = 'http://www.jinhua.gov.cn/zjjh/jhnj/'
           break;
         }
       } else {
-        console.log(source.target)
+        // TODO: 金华 2016 年及以前的数据需要点击 点击跳转 后才能正确展示
+        const redirectTarget = await page.$$eval('a', (aTagList: HTMLAnchorElement[]) => aTagList.find(aTag => (aTag.innerText.includes('点击阅读')) || { href: null } ).href);
+        if (redirectTarget) {
+          await page.goto(redirectTarget, {
+            waitUntil: 'networkidle2'
+          });
+        } else {
+          console.log(source.target)
+        }
       }
       // TODO: 这里为了节省流量，循环到第一个自动退出
       // break;
