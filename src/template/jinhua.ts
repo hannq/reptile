@@ -2,7 +2,7 @@
  * @Author: hannq
  * @Date: 2020-04-29 00:09:34
  * @Last Modified by: hannq
- * @Last Modified time: 2020-05-04 20:15:35
+ * @Last Modified time: 2020-05-05 10:35:00
  * @desc 主入口文件
  */
 
@@ -27,7 +27,7 @@ const SOURCE_URL = 'http://www.jinhua.gov.cn/zjjh/jhnj/'
     const sourceList = await page.$$eval('.jh_gl_mr_m2 ul>li a', (aList: HTMLAnchorElement[]) => aList.map(aTag => ({
       title: aTag.innerText.trim(),
       target: aTag.href
-    })));
+    }))).catch(e => (console.log(e, SOURCE_URL), []));
     for (const source of sourceList) {
       await page.goto(source.target, {
         waitUntil: 'networkidle2',
@@ -52,7 +52,7 @@ const SOURCE_URL = 'http://www.jinhua.gov.cn/zjjh/jhnj/'
             }
             return acc;
           }, []);
-        })
+        }).catch(e => (console.log(e, source.target), []));
         for (const secondItem of secondPage) {
           for (const secondContent of secondItem.content) {
             await page.goto(secondContent.target, {
