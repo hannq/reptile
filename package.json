@@ -2,10 +2,12 @@
   "name": "reptile",
   "version": "1.0.0",
   "description": "to be continued ...",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "start": "electron .",
     "dev": "tsc -w",
     "build": "tsc",
+    "build:e": "electron-builder --win --x64",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,19 +22,38 @@
   },
   "homepage": "https://github.com/hannq/reptile#readme",
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "@types/fs-extra": "^8.1.0",
     "@types/micromatch": "^4.0.1",
+    "@types/node": "^12.12.37",
     "@types/node-xlsx": "^0.15.0",
     "@types/puppeteer": "^2.0.1",
-    "fs-extra": "^9.0.0",
+    "devtron": "^1.4.0",
+    "electron": "^8.2.5",
+    "electron-builder": "^22.6.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "fs-extra": "^9.0.0",
     "fuse.js": "^5.2.3",
     "micromatch": "^4.0.2",
     "node-xlsx": "^0.15.0",
     "puppeteer": "^3.0.2",
     "tabletojson": "^2.0.4",
     "upath": "^1.2.0"
+  },
+  "build": {
+    "appId": "com.xxx.app",
+    "files": [
+      "./index.html",
+      "./package.json",
+      "./dist/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    }
   }
 }
