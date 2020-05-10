@@ -6,6 +6,7 @@ const paths = require('../paths');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpackBaseConfigFactory = require('./webpack.config.base');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 /** @type { (env: NodeJS.ProcessEnv) => import('webpack').Configuration } */
 module.exports = (env) => {
@@ -15,24 +16,32 @@ module.exports = (env) => {
     {
       target: 'electron-renderer',
       mode: 'development',
+      devtool: 'source-map',
+      resolve: {
+        alias: {
+          'react-dom': '@hot-loader/react-dom',
+        }
+      },
       entry: {
-        ui: [
-          `webpack-dev-server/client?http://127.0.0.1:8080`,
+        renderer: [
+          'react-hot-loader/patch',
+          `webpack-dev-server/client?http://localhost:8080/renderer`,
           'webpack/hot/only-dev-server',
-          paths.uiEntry
+          paths.rendererEntry
         ]
       },
       output: {
-        publicPath: 'http://localhost:8080/',
-        path: paths.uiDist,
+        publicPath: 'http://localhost:8080/renderer/',
+        path: paths.rendererDist,
         filename: '[name].js'
       },
       plugins: [
         new webpack.NamedModulesPlugin(),
+        new ForkTsCheckerWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-          template: path.join(__dirname, '../app/ui/index.html'),
-          filename: 'index.html'
+          template: path.join(paths.SOURCE_PATH, 'index.html'),
+          filename: path.join(paths.DIST_PATH, 'index.html'),
         })
       ]
     }

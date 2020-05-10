@@ -6,11 +6,13 @@
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <!-- Full permission string -->
     <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+    <style>
+      body {
+        background-color: #fff;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>. -->
+    <div id="app"></div>
   </body>
 </html>

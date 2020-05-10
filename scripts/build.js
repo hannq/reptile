@@ -4,16 +4,19 @@ const webpack = require('webpack');
 const chalk = require('chalk');
 const path = require('path');
 const dayjs = require('dayjs');
+const paths = require('../paths');
+const fse = require('fs-extra');
 const webpackMainConfigFactory = require('../config/webpack.config.main.prod');
 const webpackRendererConfigFactory = require('../config/webpack.config.renderer.prod');
 const env = process.env
 
 ;(async function () {
-  const mainCompiler = webpack([
-    webpackMainConfigFactory(env),
-    webpackRendererConfigFactory(env)
+  await fse.emptyDir(paths.DIST_PATH);
+  const compiler = webpack([
+    webpackRendererConfigFactory(env),
+    webpackMainConfigFactory(env)
   ]);
-  mainCompiler.run(function (err, stats) {
+  compiler.run(function (err, stats) {
     if (err || stats.hasErrors()) {
       // 在这里处理错误
     }

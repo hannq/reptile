@@ -2,11 +2,13 @@
 
 const path = require('path');
 const DIST_PATH = path.join(__dirname, '../dist');
+const SOURCE_PATH = path.join(__dirname, '../app');
 
 module.exports = {
   DIST_PATH,
-  uiEntry: path.join(__dirname, '../app/ui/index'),
+  SOURCE_PATH,
+  rendererEntry: path.join(__dirname, '../app/renderer/index'),
   mainEntry: path.join(__dirname, '../app/main'),
-  uiDist: path.join(DIST_PATH, 'ui'),
+  rendererDist: path.join(DIST_PATH, 'renderer'),
   mainDist: DIST_PATH
 }

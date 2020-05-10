@@ -9,25 +9,37 @@ const webpackBaseConfigFactory = require('./webpack.config.base');
 /** @type { (env: NodeJS.ProcessEnv) => import('webpack').Configuration } */
 module.exports = (env) => {
   const webpackBaseConfig = webpackBaseConfigFactory(env)
-  return merge(
+  return merge.smart(
     webpackBaseConfig,
     {
       target: 'electron-renderer',
       mode: 'production',
       entry: {
-        ui: paths.uiEntry
+        renderer: paths.rendererEntry
       },
       output: {
-        path: paths.uiDist,
+        path: paths.rendererDist,
         filename: '[name].js',
         chunkFilename: '[name].js'
       },
+      module: {
+        rules: [{
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: 'ts-loader',
+              options: { transpileOnly: true }
+            }
+          ]
+        }]
+      },
       plugins: [
         new HtmlWebpackPlugin({
-          template: path.join(__dirname, '../app/ui/index.html'),
-          filename: 'index.html'
+          template: path.join(paths.SOURCE_PATH, 'index.html'),
+          filename: path.join(paths.DIST_PATH, 'index.html'),
         })
       ]
-    }
-  )
+    })
 }
+

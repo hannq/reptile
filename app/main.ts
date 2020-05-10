@@ -1,7 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
+import puppeteer from "puppeteer-core";
+import { logger, externalsHandler } from './utils';
+import config from './config';
 
-function createWindow () {
+async function createWindow() {
   // 创建浏览器窗口
   const win = new BrowserWindow({
     width: 800,
@@ -11,12 +14,45 @@ function createWindow () {
     }
   })
 
-  // 并且为你的应用加载index.html
-  win.loadFile('./dist/ui/index.html', {  })
+  if (!config.CHROME_EXEC_PARH) {
+    const { canceled, filePaths: [CHROME_EXEC_PARH = null] } = await dialog.showOpenDialog({
+      title: '请选择 chrome 可执行文件',
+      properties: ['openFile']
+    });
+    if (!canceled && CHROME_EXEC_PARH) await externalsHandler.updateConfig('CHROME_EXEC_PARH', CHROME_EXEC_PARH);
+  }
 
-  // 打开开发者工具
-  win.webContents.openDevTools()
-  require('devtron').install()
+  if (__DEV__) {
+    await win.loadURL('http://localhost:8080', { })
+  } else {
+    await win.loadFile('./dist/index.html', { })
+  }
+
+
+  ipcMain.addListener('screenshot132', async function () {
+    try {
+      logger.info('before puppeteer.launch');
+      const browser = await puppeteer.launch({ executablePath: config.CHROME_EXEC_PARH });
+      logger.info('before newPage');
+      const page = await browser.newPage();
+      logger.info("before goto('https://www.baidu.com')");
+      await page.goto('https://www.baidu.com');
+      logger.info("before screenshot");
+      await page.screenshot({ path: path.join('C:\\Users\\10944\\Desktop', 'aaa.png') });
+      logger.info("before close");
+      await browser.close();
+      logger.info('save path', path.join('C:\\Users\\10944\\Desktop', 'aaa.png'))
+    } catch (e) {
+      logger.info("someting wrong!");
+      logger.error(e);
+    }
+  })
+
+  if (__DEV__) {
+    // 打开开发者工具
+    win.webContents.openDevTools()
+    require('devtron').install();
+  }
 }
 
 // This method will be called when Electron has finished
