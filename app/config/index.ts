@@ -8,7 +8,7 @@ class Config {
   readonly LOG_PATH: string = logger.transports.file.file;
   readonly CHROME_EXEC_PARH: string = null;
   constructor(externalConfig: Partial<Config>) {
-    Object.keys(this).forEach(key => {
+    externalConfig && Object.keys(this).forEach(key => {
       if (!isNullOrUndefined(externalConfig[key])) this[key] = externalConfig[key];
     });
   }
