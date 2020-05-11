@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ipcRenderer } from 'electron';
+import Webview from '../webview';
 
 interface IProps {
 
@@ -14,6 +15,7 @@ const Index: React.FC<IProps> = () => {
         setCount(count + 1)
         ipcRenderer.send('screenshot132');
       }}>count + 1</button>
+      <Webview />
     </div>
   )
 }

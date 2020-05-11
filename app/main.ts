@@ -1,9 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
 import path from 'path';
 import puppeteer from "puppeteer-core";
 import { logger, externalsHandler } from './utils';
 import config from './config';
+import { initMenu } from './menu';
 import dayjs from 'dayjs';
+
+initMenu();
 
 async function createWindow() {
   // 创建浏览器窗口
@@ -11,8 +14,8 @@ async function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
-    }
+      webviewTag: true
+    },
   });
 
   if (!config.CHROME_EXEC_PARH) {
@@ -45,10 +48,10 @@ async function createWindow() {
       logger.info("before goto('https://www.baidu.com')");
       await page.goto('https://www.baidu.com');
       logger.info("before screenshot");
-      await page.screenshot({ path: path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.png`) });
+      await page.screenshot({ path: path.join(config.OUTPUT_PARH, 'aaa.png') });
       logger.info("before close");
       await browser.close();
-      logger.info('save path', path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.png`))
+      logger.info('save path', path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD-HH:mm:ss')}.png`))
     } catch (e) {
       logger.info("someting wrong!");
       logger.error(e);
