@@ -28,7 +28,8 @@ module.exports = (env) => {
     },
     plugins: [
       new webpack.DefinePlugin({
-        '__DEV__': isDev
+        '__DEV__': isDev,
+        '__DEV_PORT__': env.DEV_PORT
       })
     ]
   }

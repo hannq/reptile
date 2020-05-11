@@ -11,12 +11,16 @@ const webpackMainConfigFactory = require('../config/webpack.config.main.dev');
 const webpackRendererConfigFactory = require('../config/webpack.config.renderer.dev');
 const env = process.env
 const HOST = process.env.HOST || '0.0.0.0';
-const PORT = 8080;
+const PORT = 3000;
 
 ;(async function () {
   await fse.emptyDir(paths.DIST_PATH);
-  const rendererConfig = webpackRendererConfigFactory(env);
-  const mainCompiler = webpack(webpackMainConfigFactory(env));
+  const mergedEnv = {
+    ...env,
+    DEV_PORT: String(PORT)
+  }
+  const rendererConfig = webpackRendererConfigFactory(mergedEnv);
+  const mainCompiler = webpack(webpackMainConfigFactory(mergedEnv));
   WebpackDevServer.addDevServerEntrypoints(rendererConfig, {});
   const server = new WebpackDevServer(webpack(rendererConfig), {
     contentBase: paths.DIST_PATH,

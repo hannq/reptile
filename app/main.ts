@@ -3,6 +3,7 @@ import path from 'path';
 import puppeteer from "puppeteer-core";
 import { logger, externalsHandler } from './utils';
 import config from './config';
+import dayjs from 'dayjs';
 
 async function createWindow() {
   // 创建浏览器窗口
@@ -12,25 +13,31 @@ async function createWindow() {
     webPreferences: {
       nodeIntegration: true
     }
-  })
+  });
 
   if (!config.CHROME_EXEC_PARH) {
     const { canceled, filePaths: [CHROME_EXEC_PARH = null] } = await dialog.showOpenDialog({
       title: '请选择 chrome 可执行文件',
-      properties: ['openFile']
+      properties: ['openFile', 'treatPackageAsDirectory']
     });
-    if (!canceled && CHROME_EXEC_PARH) await externalsHandler.updateConfig('CHROME_EXEC_PARH', CHROME_EXEC_PARH);
+    if (!canceled && CHROME_EXEC_PARH) await externalsHandler.updateConfig('CHROME_EXEC_PARH', CHROME_EXEC_PARH, { restart: true });
   }
 
   if (__DEV__) {
-    await win.loadURL('http://localhost:8080', { })
+    await win.loadURL(`http://localhost:${__DEV_PORT__}`, { })
   } else {
     await win.loadFile('./dist/index.html', { })
   }
 
-
   ipcMain.addListener('screenshot132', async function () {
     try {
+      if (!config.OUTPUT_PARH) {
+        const { canceled, filePaths: [OUTPUT_PARH = null] } = await dialog.showOpenDialog({
+          title: '请选择输出目录',
+          properties: ['openDirectory']
+        });
+        if (!canceled && OUTPUT_PARH) await externalsHandler.updateConfig('OUTPUT_PARH', OUTPUT_PARH);
+      }
       logger.info('before puppeteer.launch');
       const browser = await puppeteer.launch({ executablePath: config.CHROME_EXEC_PARH });
       logger.info('before newPage');
@@ -38,10 +45,10 @@ async function createWindow() {
       logger.info("before goto('https://www.baidu.com')");
       await page.goto('https://www.baidu.com');
       logger.info("before screenshot");
-      await page.screenshot({ path: path.join('C:\\Users\\10944\\Desktop', 'aaa.png') });
+      await page.screenshot({ path: path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.png`) });
       logger.info("before close");
       await browser.close();
-      logger.info('save path', path.join('C:\\Users\\10944\\Desktop', 'aaa.png'))
+      logger.info('save path', path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD HH:mm:ss')}.png`))
     } catch (e) {
       logger.info("someting wrong!");
       logger.error(e);

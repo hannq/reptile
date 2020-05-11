@@ -25,13 +25,13 @@ module.exports = (env) => {
       entry: {
         renderer: [
           'react-hot-loader/patch',
-          `webpack-dev-server/client?http://localhost:8080/renderer`,
+          `webpack-dev-server/client?http://localhost:${env.DEV_PORT}/renderer`,
           'webpack/hot/only-dev-server',
           paths.rendererEntry
         ]
       },
       output: {
-        publicPath: 'http://localhost:8080/renderer/',
+        publicPath: `http://localhost:${env.DEV_PORT}/renderer/`,
         path: paths.rendererDist,
         filename: '[name].js'
       },
