@@ -1,10 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, Menu, shell } from 'electron';
 import path from 'path';
 import puppeteer from "puppeteer-core";
 import { logger, externalsHandler } from './utils';
 import config from './config';
 import { initMenu } from './menu';
 import dayjs from 'dayjs';
+import { downloadImage } from './tasks';
+import _ from 'lodash';
 
 initMenu();
 
@@ -14,7 +16,8 @@ async function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      webviewTag: true
+      webviewTag: true,
+      nodeIntegration: true
     },
   });
 
@@ -32,7 +35,7 @@ async function createWindow() {
     await win.loadFile('./dist/index.html', { })
   }
 
-  ipcMain.addListener('screenshot132', async function () {
+  ipcMain.addListener('screenshot132', async function (e, num: number = 10) {
     try {
       if (!config.OUTPUT_PARH) {
         const { canceled, filePaths: [OUTPUT_PARH = null] } = await dialog.showOpenDialog({
@@ -41,22 +44,26 @@ async function createWindow() {
         });
         if (!canceled && OUTPUT_PARH) await externalsHandler.updateConfig('OUTPUT_PARH', OUTPUT_PARH);
       }
-      logger.info('before puppeteer.launch');
+
       const browser = await puppeteer.launch({ executablePath: config.CHROME_EXEC_PARH });
-      logger.info('before newPage');
       const page = await browser.newPage();
-      logger.info("before goto('https://www.baidu.com')");
-      await page.goto('https://www.baidu.com');
-      logger.info("before screenshot");
-      await page.screenshot({ path: path.join(config.OUTPUT_PARH, 'aaa.png') });
-      logger.info("before close");
+      await page.goto('https://thispersondoesnotexist.com/image.jpg', { waitUntil: 'networkidle0' });
+      for(let i = 1; i <= num; i++) {
+        // await downloadImage(config.OUTPUT_PARH, `${i}-${Date.now()}`);
+        const img = await page.$('img');
+        await img.screenshot({ path: path.join(config.OUTPUT_PARH, `${i}-${Date.now()}.jpg`) });
+        await page.reload({ waitUntil: 'networkidle0' });
+        win.webContents.send('taskReady', i);
+      }
       await browser.close();
-      logger.info('save path', path.join(config.OUTPUT_PARH, `${dayjs().format('YYYY-MM-DD-HH:mm:ss')}.png`))
+      shell.openExternal(config.OUTPUT_PARH);
     } catch (e) {
       logger.info("someting wrong!");
       logger.error(e);
     }
   })
+
+
 
   if (__DEV__) {
     // 打开开发者工具
