@@ -12,7 +12,6 @@ const Index: React.FC<IProps> = () => {
 
   useEffect(() => {
     ipcRenderer.on('taskReady', (e, count) => {
-      console.log('taskReady -->');
       setCount(count);
     });
   }, [])

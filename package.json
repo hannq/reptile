@@ -9,7 +9,7 @@
     "dev": "cross-env NODE_ENV=development node ./scripts/dev.js",
     "build:tsc": "tsc",
     "build": "cross-env NODE_ENV=production node ./scripts/build.js",
-    "build:e": "electron-builder --win --x64",
+    "build:e": "rimraf ./release && electron-builder --win --x64",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -52,6 +52,7 @@
     "html-webpack-plugin": "^4.3.0",
     "react-dev-utils": "^10.2.1",
     "react-hot-loader": "^4.12.21",
+    "rimraf": "^3.0.2",
     "ts-loader": "^7.0.3",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
@@ -80,8 +81,11 @@
   },
   "build": {
     "appId": "com.xxx.app",
+    "directories": {
+      "output": "./release"
+    },
     "files": [
-      "./dist/**/*"
+      "dist/"
     ],
     "win": {
       "target": [
