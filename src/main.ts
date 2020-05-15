@@ -63,8 +63,6 @@ async function createWindow() {
     }
   })
 
-
-
   if (__DEV__) {
     // 打开开发者工具
     win.webContents.openDevTools()

@@ -9,6 +9,8 @@ const dayjs = require('dayjs');
 const paths = require('../paths');
 const webpackMainConfigFactory = require('../config/webpack.config.main.dev');
 const webpackRendererConfigFactory = require('../config/webpack.config.renderer.dev');
+const webpackInjectionConfigFactory = require('../config/webpack.config.injection.dev');
+const clearConsole = require('react-dev-utils/clearConsole');
 const env = process.env
 const HOST = process.env.HOST || '0.0.0.0';
 const PORT = 3000;
@@ -20,8 +22,11 @@ const PORT = 3000;
     DEV_PORT: String(PORT)
   }
   const rendererConfig = webpackRendererConfigFactory(mergedEnv);
-  const mainCompiler = webpack(webpackMainConfigFactory(mergedEnv));
-  WebpackDevServer.addDevServerEntrypoints(rendererConfig, {});
+  const mainCompiler = webpack([
+    webpackMainConfigFactory(mergedEnv),
+    webpackInjectionConfigFactory(mergedEnv)
+  ]);
+  // WebpackDevServer.addDevServerEntrypoints(rendererConfig, {});
   const server = new WebpackDevServer(webpack(rendererConfig), {
     contentBase: paths.DIST_PATH,
     publicPath: '/',
@@ -37,15 +42,19 @@ const PORT = 3000;
     hot: true,
     hotOnly: true
   });
+
   server.listen(PORT, HOST,() => { });
-  const watcher = mainCompiler.watch({}, function(err, stats) {
+
+  // TODO: 这里的 watcher 暂时找不到用处
+  const _watcher = mainCompiler.watch({}, function(err, stats) {
     if (err || stats.hasErrors()) {
       // 在这里处理错误
       process.stdout.write(stats.toString({
         colors: true,
         chunks: false
       }));
-      watcher.close(() => {  });
+    } else {
+      // clearConsole();
     }
   })
 })()

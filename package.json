@@ -81,6 +81,9 @@
   },
   "build": {
     "appId": "com.xxx.app",
+    "extraFiles": [
+      "webview-injection"
+    ],
     "asar": false,
     "directories": {
       "output": "./release"

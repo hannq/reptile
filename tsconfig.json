@@ -67,10 +67,10 @@
     "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "app/*"
+    "src/*"
   ],
   "exclude": [
-    "app/renderer/*",
+    "src/renderer/*",
     "dist/*",
     "node_modules/*"
   ]

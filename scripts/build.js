@@ -8,13 +8,15 @@ const paths = require('../paths');
 const fse = require('fs-extra');
 const webpackMainConfigFactory = require('../config/webpack.config.main.prod');
 const webpackRendererConfigFactory = require('../config/webpack.config.renderer.prod');
+const webpackInjectionFactory = require('../config/webpack.config.injection.prod');
 const env = process.env
 
 ;(async function () {
   await fse.emptyDir(paths.DIST_PATH);
   const compiler = webpack([
     webpackRendererConfigFactory(env),
-    webpackMainConfigFactory(env)
+    webpackMainConfigFactory(env),
+    webpackInjectionFactory(env)
   ]);
   compiler.run(function (err, stats) {
     if (err || stats.hasErrors()) {

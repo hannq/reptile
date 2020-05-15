@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import Webview from '../webview';
+import '../../renderer-ipc-bus';
 
 interface IProps {
 
