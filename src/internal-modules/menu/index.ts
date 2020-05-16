@@ -1,5 +1,6 @@
 import { app, Menu, MenuItemConstructorOptions, shell } from 'electron';
-import config, { paths } from '../config';
+import type { IModule } from '../../utils';
+import config, { paths } from '../../config';
 
 // const isMac = process.platform === 'darwin'
 
@@ -126,8 +127,10 @@ const template: MenuItemConstructorOptions[] = [
   }
 ]
 
-export function initMenu () {
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-}
 
+export class MenuModule implements IModule {
+  async init() {
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+  }
+}

@@ -2,7 +2,7 @@ import YAML from 'yaml';
 import fse from 'fs-extra';
 import paths from './paths';
 import logger from 'electron-log';
-import { IPC_KEYS } from './ipc-keys';
+import * as IPC_KEYS from './ipc-keys';
 import { isNullOrUndefined } from 'util';
 
 type Map2Func<K extends keyof T, T> = (K extends any ? (arg1: K) => T[K]: never);

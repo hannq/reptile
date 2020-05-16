@@ -1,16 +1,18 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu, shell } from 'electron';
-import path from 'path';
-import puppeteer from "puppeteer-core";
-import { logger, externalsHandler } from './utils';
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
+import { MenuModule } from './internal-modules';
+import { logger, externalsHandler, ModuleRegister } from './utils';
+import { Subject } from 'rxjs';
 import config from './config';
-import { initMenu } from './menu';
 import dayjs from 'dayjs';
 import { downloadImage } from './tasks';
 import _ from 'lodash';
 
-initMenu();
-
+const moduleRegister = new ModuleRegister(new Subject());
+moduleRegister.tap(new MenuModule());
 async function createWindow() {
+  const result = await moduleRegister.call()
+  console.log('result -->', result)
+  return
   // 创建浏览器窗口
   const win = new BrowserWindow({
     width: 800,
@@ -34,34 +36,6 @@ async function createWindow() {
   } else {
     await win.loadFile('./dist/index.html', { })
   }
-
-  ipcMain.addListener('screenshot132', async function (e, num: number = 10) {
-    try {
-      if (!config.OUTPUT_PARH) {
-        const { canceled, filePaths: [OUTPUT_PARH = null] } = await dialog.showOpenDialog({
-          title: '请选择输出目录',
-          properties: ['openDirectory']
-        });
-        if (!canceled && OUTPUT_PARH) await externalsHandler.updateConfig('OUTPUT_PARH', OUTPUT_PARH);
-      }
-
-      const browser = await puppeteer.launch({ executablePath: config.CHROME_EXEC_PARH });
-      const page = await browser.newPage();
-      await page.goto('https://thispersondoesnotexist.com/image.jpg', { waitUntil: 'networkidle0' });
-      for(let i = 1; i <= num; i++) {
-        // await downloadImage(config.OUTPUT_PARH, `${i}-${Date.now()}`);
-        const img = await page.$('img');
-        await img.screenshot({ path: path.join(config.OUTPUT_PARH, `${i}-${Date.now()}.jpg`) });
-        await page.reload({ waitUntil: 'networkidle0' });
-        win.webContents.send('taskReady', i);
-      }
-      await browser.close();
-      shell.openExternal(config.OUTPUT_PARH);
-    } catch (e) {
-      logger.info("someting wrong!");
-      logger.error(e);
-    }
-  })
 
   if (__DEV__) {
     // 打开开发者工具
