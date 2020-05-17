@@ -1,6 +1,6 @@
 import { app, Menu, MenuItemConstructorOptions, shell } from 'electron';
-import type { IModule } from '../../utils';
-import config, { paths } from '../../config';
+import type { IModule } from '@utils';
+import config from '@config';
 
 // const isMac = process.platform === 'darwin'
 
@@ -120,17 +120,19 @@ const template: MenuItemConstructorOptions[] = [
       {
         label: '配置文件',
         click: async () => {
-          await shell.openExternal(paths.EXTERNAL_CONFIG_YAML)
+          await shell.openExternal(config.USER_CONFIG_YAML)
         }
       }
     ]
   }
 ]
 
-
 export class MenuModule implements IModule {
-  async init() {
-    const menu = Menu.buildFromTemplate(template)
-    Menu.setApplicationMenu(menu)
+  $$name = 'MenuModule';
+  $$loaded = false;
+
+  async init(...args) {
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
   }
 }

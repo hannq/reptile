@@ -1,7 +1,7 @@
 // @ts-check
 const webpack = require('webpack');
-// const paths = require('../paths');
-// const path = require('path');
+const path = require('path');
+const paths = require('../paths');
 // const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /** @type { (env: NodeJS.ProcessEnv) => import('webpack').Configuration } */
@@ -10,6 +10,10 @@ module.exports = (env) => {
   return {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      alias: {
+        '@config': path.join(paths.SOURCE_PATH, 'config/index'),
+        '@utils': path.join(paths.SOURCE_PATH, 'utils/index')
+      }
     },
     module: {
       rules: [

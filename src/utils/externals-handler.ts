@@ -1,5 +1,5 @@
 import { app, dialog } from 'electron';
-import config, { paths, INoFuncConfig } from '../config';
+import config, { INoFuncConfig } from '@config';
 import YAML from 'yaml';
 import fse from 'fs-extra';
 import logger from './logger';
@@ -20,10 +20,10 @@ async function updateConfig<K extends keyof INoFuncConfig> (key: K, val: INoFunc
     const {
       restart = false
     } = opts
-    const content = await fse.readFile(paths.EXTERNAL_CONFIG_YAML, 'utf8');
+    const content = await fse.readFile(config.USER_CONFIG_YAML, 'utf8');
     const externalConfig: Partial<INoFuncConfig> = YAML.parse(content) || {};
     externalConfig[key] = val;
-    await fse.writeFile(paths.EXTERNAL_CONFIG_YAML, YAML.stringify(externalConfig), 'utf8');
+    await fse.writeFile(config.USER_CONFIG_YAML, YAML.stringify(externalConfig), 'utf8');
     config.update(key, val)
     if (restart) await restartWhenConfigChange();
     return true

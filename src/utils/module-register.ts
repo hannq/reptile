@@ -1,19 +1,64 @@
-import { Subject, from } from 'rxjs';
-import { concatMap, mapTo, mergeAll } from 'rxjs/operators';
+import { Subject, from, of, Observable } from 'rxjs';
+import { switchMap, concatMap, tap, endWith, map, filter } from 'rxjs/operators';
+import logger from './logger';
 
 export interface IModule {
+  /** 模块名称 */
+  $$name: string;
+  /** 模块是否已经加载成功 */
+  $$loaded: boolean;
+  /** 模块 初始化函数 */
   init(...args): void;
 }
 
-export class ModuleRegister<S> {
-  private readonly moduleList: IModule[] = []
-  constructor(
+/**
+ * 模块加载器，已经成功加载的模块不会再重复加入
+ */
+export class ModuleRegister<S extends readonly any[]> {
+  /** 多播订阅器 */
+  private readonly multicast = new Subject<void | Observable<void> | void[]>();
+  /** 需压加载的模块列表 */
+  private readonly moduleList: (IModule[] | IModule)[] = [];
+  /** 内置日志记录工具 */
+  private readonly logger = logger.scope('ModuleRegister')
+
+  constructor (
     private readonly subject: Subject<S>
   ) {
-
+    this.subject
+      .pipe(
+        switchMap(() => from(this.moduleList).pipe(endWith(of<void>()))),
+        filter(v => Array.isArray(v) || (v instanceof Observable) || !v.$$loaded),
+        concatMap(v => {
+          if (Array.isArray(v)) {
+            const pureItems = v.filter(v => !v.$$loaded);
+            return Promise.all(pureItems.map(item => Promise.resolve(item.init()))).then(r => <const>[pureItems, r])
+          } else if (!(v instanceof Observable)) {
+            return Promise.resolve(v.init()).then(r => <const>[v, r])
+          } else {
+            return of(<const>[v, v])
+          }
+        }),
+        tap(([v]) => {
+          if (v instanceof Observable) {
+            this.logger.info('All module loaded success !')
+          } else if (Array.isArray(v)) {
+            v.forEach(v => v.$$loaded = true);
+            this.logger.info(`Modules: ${v.map(({$$name}) => $$name).join(', ')} loaded !`);
+          } else {
+            v.$$loaded = true;
+            this.logger.info(`Module: ${v.$$name} loaded !`);
+          }
+        }),
+        map(([,v]) => v)
+      ).subscribe(this.multicast);
   }
 
-  tap(module: IModule) {
+  /**
+   * 模块注册
+   * @param module 需要被加载的模块
+   */
+  tap(module: IModule[] | IModule) {
     this.moduleList.push(module);
     return () => {
       const index = this.moduleList.indexOf(module);
@@ -21,29 +66,25 @@ export class ModuleRegister<S> {
     }
   }
 
-  call<T extends any[]>(...args: T) {
-    this.subject
-      .pipe(mapTo(from(this.moduleList)), mergeAll())
-      .pipe(concatMap(module => from(Promise.resolve(module.init(...args)))))
-      .toPromise()
+  /**
+   * 加载模块
+   * @param args
+   */
+  call<T extends S>(...args: T) {
+    this.subject.next(args);
+    return new Promise<void>(resolve => {
+      this.multicast.subscribe(v => {
+        if (v instanceof Observable) {
+          resolve(v.toPromise());
+        }
+      })
+    })
   }
 
-  retry() {
-    this.subject.next();
-  }
-
-  retryAborted() {
-    this.subject.next();
+  /**
+   * 重试加载失败的模块
+   */
+  retryAborted<T extends S>(...args: T) {
+    this.subject.next(args);
   }
 }
-
-const subject = new Subject();
-
-// function Foo<T extends readonly any[]> (...args: T): T {
-//   return args;
-// }
-
-// Foo(() => {}, 'aaaa', 'ccccc')
-
-export default new ModuleRegister(subject)
-
