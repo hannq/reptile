@@ -13,7 +13,7 @@ import { Subject } from 'rxjs';
 async function main() {
   const moduleRegister = new ModuleRegister(new Subject<[]>());
   moduleRegister.tap(new SetupConfigModule());
-  moduleRegister.tap(new MenuModule());
+  moduleRegister.tap(new MenuModule(), new MenuModule());
   moduleRegister.tap(
     new MainBrowserWindowModule({
       devTools: __DEV__,
@@ -22,7 +22,7 @@ async function main() {
   );
   await moduleRegister.call();
 
-  setTimeout(() => moduleRegister.call(), 5000)
+  // setTimeout(() => moduleRegister.call(), 5000)
 }
 
 // This method will be called when Electron has finished
