@@ -13,6 +13,8 @@ export interface IBaseOpts {
  * 初始化 BrowserWindow 相关模块
  */
 export class BaseBrowserWindowModule implements IModule {
+  static devtronInstalled = false;
+
   static baseConfig: IBaseOpts  = {
     isDev: false,
     devTools: false
@@ -64,7 +66,10 @@ export class BaseBrowserWindowModule implements IModule {
     // 打开开发者工具
     if (isDev) {
       this.win.webContents.openDevTools();
-      require('devtron').install();
+      if (!BaseBrowserWindowModule.devtronInstalled) {
+        require('devtron').install();
+        BaseBrowserWindowModule.devtronInstalled = true;
+      }
     }
   }
 }

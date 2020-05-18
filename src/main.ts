@@ -25,6 +25,8 @@ async function main() {
   // setTimeout(() => moduleRegister.call(), 5000)
 }
 
+app.allowRendererProcessReuse = false;
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // 部分 API 在 ready 事件触发后才能使用。
