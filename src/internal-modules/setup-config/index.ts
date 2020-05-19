@@ -25,12 +25,12 @@ export class SetupConfigModule implements IModule {
     /** 从用户配置文件中读取用户的自定义配置 */
     const externalConfig: Partial<INoFuncConfig> = YAML.parse(fse.readFileSync(USER_CONFIG_YAML, { encoding: 'utf8' }));
     /** 设置日志输出目录 */
-    if (externalConfig.LOG_PATH) logger.transports.file.file = externalConfig.LOG_PATH;
+    if (externalConfig.LOG_PATH) logger.transports.file.resolvePath = () => externalConfig.LOG_PATH;
     // 更新 config 中的字段
     config.batchUpdate({
-      LOG_PATH: logger.transports.file.file,
       USER_CONFIG_YAML,
       ...externalConfig,
+      LOG_PATH: logger.transports.file.getFile().path,
       WEBVIEW_INJECTION,
       EXTERNALS_DIR,
     })
@@ -46,9 +46,10 @@ export class SetupConfigModule implements IModule {
   }
 
   /**
+   * TODO: 有待优化
    * 检查 供给 puppetter 运行的 CHROME 可执行文件地址 是否存在
    */
-  async checkChromeExec () {
+  private async checkChromeExec () {
     if (!config.CHROME_EXEC_PARH) {
       const { canceled, filePaths: [CHROME_EXEC_PARH = null] } = await dialog.showOpenDialog({
         title: '请选择 chrome 可执行文件',

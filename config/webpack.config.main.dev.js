@@ -18,6 +18,15 @@ module.exports = (env) => {
       entry: {
         main: paths.mainEntry
       },
+      externals: [
+        function(_, request, callback) {
+        if (request.match(/devtron/)) {
+          return callback(null, 'commonjs ' + request)
+        }
+        // @ts-ignore
+        callback();
+      }
+      ],
       output: {
         path: paths.mainDist,
         filename: '[name].js'

@@ -65,11 +65,11 @@ export class BaseBrowserWindowModule implements IModule {
     const { isDev } = this.opts
     // 打开开发者工具
     if (isDev) {
-      this.win.webContents.openDevTools();
       if (!BaseBrowserWindowModule.devtronInstalled) {
         require('devtron').install();
         BaseBrowserWindowModule.devtronInstalled = true;
       }
+      this.win.webContents.openDevTools();
     }
   }
 }

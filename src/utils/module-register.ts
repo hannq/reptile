@@ -1,5 +1,5 @@
-import { Subject, from, asyncScheduler, Observable } from 'rxjs';
-import { switchMap, concatMap, tap, endWith, map, filter, buffer, distinctUntilKeyChanged, share } from 'rxjs/operators';
+import { Subject, from, asyncScheduler, Observable, ReplaySubject } from 'rxjs';
+import { switchMap, concatMap, tap, filter, share, groupBy, mergeMap, reduce } from 'rxjs/operators';
 import logger from './logger';
 
 type IModuleInitOutput = void;
@@ -11,7 +11,7 @@ export interface IModule {
   $$fake?: boolean;
   /** 模块是否已经加载成功 */
   $$loaded?: boolean;
-  /** 模块是否已经加载成功 */
+  /** 模块分组 id */
   $$groupId?: number;
   /** 模块 初始化函数 */
   init(...args): IModuleInitOutput;
@@ -42,22 +42,23 @@ export class ModuleRegister<S extends readonly any[]> {
     private readonly source$: Subject<S>
   ) {
     this.output$ = this.init();
-    // this.output$.subscribe(v => console.log('v --->', v));
   }
 
   init() {
-    const task$ = this.source$.pipe(
-      switchMap(() => from([...this.moduleList, this.fakeModule], asyncScheduler)),
-      // tap(v => console.log('switchMap', v)),
-      filter(v => !v.$$loaded)
-    );
-    return task$.pipe(
-      buffer(task$.pipe(distinctUntilKeyChanged('$$groupId'))),
-      tap(v => console.log('buffer', v)),
-      filter(v => !!v.length),
-      concatMap(modules => Promise.all(modules.map(v => Promise.resolve(v.init()).then(r => <const>[v, r])))),
-      tap((modulesEntry) => {
-        const modules = modulesEntry.map(([module]) => module)
+    return this.source$.pipe(
+      switchMap(() => from(
+        [...this.moduleList, this.fakeModule],
+        asyncScheduler
+      ).pipe(
+        filter(v => !v.$$loaded),
+        groupBy(v => v.$$groupId, null, null, () => new ReplaySubject<IModule>()),
+        concatMap(modules$ => modules$.pipe(
+          mergeMap(module => Promise.resolve(module.init()).then(r => <const>[module, r])),
+          reduce((acc, v) => [...acc, v], [] as [IModule, IModuleInitOutput][]),
+        )),
+      )),
+      tap((modulesEntries) => {
+        const modules = modulesEntries.map(([module]) => module)
         if (modules.find(v => v.$$fake)) {
           this.logger.info('All module loaded success !');
         } else {
@@ -89,7 +90,6 @@ export class ModuleRegister<S extends readonly any[]> {
    */
   call<T extends S>(...args: T) {
     return new Promise<void>(resolve => {
-      console.log('call ---->')
       const Subscription = this.output$.subscribe(([[module]]) => {
         if (module.$$fake) {
           resolve();

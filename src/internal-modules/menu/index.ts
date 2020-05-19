@@ -1,5 +1,6 @@
 import { app, Menu, MenuItemConstructorOptions, shell } from 'electron';
 import type { IModule } from '@utils';
+import path from 'path';
 import config from '@config';
 
 // const isMac = process.platform === 'darwin'
@@ -114,12 +115,14 @@ const template: MenuItemConstructorOptions[] = [
       {
         label: '日志',
         click: async () => {
+          // console.log('config.LOG_PATH --->', config.LOG_PATH)
           await shell.openExternal(config.LOG_PATH)
         }
       },
       {
         label: '配置文件',
         click: async () => {
+          // console.log('config.USER_CONFIG_YAML --->', config.USER_CONFIG_YAML)
           await shell.openExternal(config.USER_CONFIG_YAML)
         }
       }

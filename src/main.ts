@@ -21,8 +21,6 @@ async function main() {
     })
   );
   await moduleRegister.call();
-
-  // setTimeout(() => moduleRegister.call(), 5000)
 }
 
 app.allowRendererProcessReuse = false;
