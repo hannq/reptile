@@ -2,6 +2,7 @@ import { BaseBrowserWindowModule, IBaseOpts } from './base-browser-window';
 import { ipcMain, dialog, BrowserWindow, shell } from 'electron';
 import { logger, externalsHandler } from '@utils';
 import puppeteer from "puppeteer-core";
+import path from "path";
 import config from '@config';
 
 interface IOpts extends IBaseOpts {
@@ -33,13 +34,14 @@ export class MainBrowserWindowModule extends BaseBrowserWindowModule {
         await page.goto('https://thispersondoesnotexist.com/image.jpg', { waitUntil: 'networkidle0' });
         for(let i = 1; i <= num; i++) {
           const img = await page.$('img');
-          img.screenshot({ path: OUTPUT_PARH})
+          console.log('screenshot ===>', path.join(OUTPUT_PARH, `${i}${Date.now()}.jpg`))
+          await img.screenshot({ path: path.join(OUTPUT_PARH, `${i}-${Date.now()}.jpg`)})
           await page.reload({ waitUntil: 'networkidle0' });
           // TODO: 如何组织这里的代码结构
           win.webContents.send('taskReady', i);
         }
         await browser.close();
-        shell.openExternal(OUTPUT_PARH);
+        shell.openItem(OUTPUT_PARH);
       } catch (e) {
         logger.info("someting wrong!");
         logger.error(e);

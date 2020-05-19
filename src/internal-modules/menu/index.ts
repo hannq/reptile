@@ -115,15 +115,13 @@ const template: MenuItemConstructorOptions[] = [
       {
         label: '日志',
         click: async () => {
-          // console.log('config.LOG_PATH --->', config.LOG_PATH)
-          await shell.openExternal(config.LOG_PATH)
+          await shell.openItem(config.LOG_PATH);
         }
       },
       {
         label: '配置文件',
         click: async () => {
-          // console.log('config.USER_CONFIG_YAML --->', config.USER_CONFIG_YAML)
-          await shell.openExternal(config.USER_CONFIG_YAML)
+          await shell.openItem(config.USER_CONFIG_YAML);
         }
       }
     ]

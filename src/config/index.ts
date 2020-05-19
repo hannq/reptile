@@ -10,8 +10,6 @@ type INoFuncConfig = _INoFuncConfig<Config>
 class Config {
   /** 输出日志目录 */
   readonly LOG_PATH: string = null;
-  /** 外部扩展文件目录 */
-  readonly EXTERNALS_DIR: string = null;
   /** 用户自定义配置文件地址 */
   readonly USER_CONFIG_YAML: string = null;
   /** 供给 puppetter 运行的 CHROME 可执行文件地址 */
