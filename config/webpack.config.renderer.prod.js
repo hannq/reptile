@@ -15,7 +15,8 @@ module.exports = (env) => {
       target: 'electron-renderer',
       mode: 'production',
       entry: {
-        renderer: paths.rendererEntry
+        renderer: paths.rendererEntry,
+        setupLoading: paths.setupLoadingEntry
       },
       output: {
         path: paths.rendererDist,
@@ -36,8 +37,14 @@ module.exports = (env) => {
       },
       plugins: [
         new HtmlWebpackPlugin({
+          chunks: ['renderer'],
           template: path.join(paths.STATIC_PATH, 'index.html'),
           filename: path.join(paths.DIST_PATH, 'index.html'),
+        }),
+        new HtmlWebpackPlugin({
+          chunks: ['setupLoading'],
+          template: path.join(paths.STATIC_PATH, 'index.html'),
+          filename: path.join(paths.DIST_PATH, 'setupLoading.html'),
         })
       ]
     })

@@ -28,6 +28,12 @@ module.exports = (env) => {
           `webpack-dev-server/client?http://localhost:${env.DEV_PORT}/renderer`,
           'webpack/hot/only-dev-server',
           paths.rendererEntry
+        ],
+        setupLoading: [
+          'react-hot-loader/patch',
+          `webpack-dev-server/client?http://localhost:${env.DEV_PORT}/renderer`,
+          'webpack/hot/only-dev-server',
+          paths.setupLoadingEntry
         ]
       },
       output: {
@@ -40,8 +46,14 @@ module.exports = (env) => {
         new ForkTsCheckerWebpackPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
+          chunks: ['renderer'],
           template: path.join(paths.STATIC_PATH, 'index.html'),
           filename: path.join(paths.DIST_PATH, 'index.html'),
+        }),
+        new HtmlWebpackPlugin({
+          chunks: ['setupLoading'],
+          template: path.join(paths.STATIC_PATH, 'index.html'),
+          filename: path.join(paths.DIST_PATH, 'setupLoading.html'),
         })
       ]
     }

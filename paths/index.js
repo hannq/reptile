@@ -14,6 +14,7 @@ module.exports = {
   injectionEntry: path.join(SOURCE_PATH, 'webview-injection/index'),
   injectionDist: WEBVIEW_INJECTION_PATH,
   rendererEntry: path.join(SOURCE_PATH, 'renderer/index'),
+  setupLoadingEntry: path.join(SOURCE_PATH, 'renderer/setup-loading-index'),
   rendererDist: path.join(DIST_PATH, 'renderer'),
   mainEntry: path.join(SOURCE_PATH, 'main'),
   mainDist: DIST_PATH

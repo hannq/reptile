@@ -26,6 +26,7 @@ export class BaseBrowserWindowModule implements IModule {
   static winBaseConfig: BrowserWindowConstructorOptions = {
     width: 800,
     height: 600,
+    show: false,
     webPreferences: {
       webviewTag: true,
       nodeIntegration: true
@@ -36,13 +37,19 @@ export class BaseBrowserWindowModule implements IModule {
     protected readonly opts: IBaseOpts = BaseBrowserWindowModule.baseConfig,
     protected readonly win = new BrowserWindow(BaseBrowserWindowModule.winBaseConfig)
   ) {
-
+    this.autoShow();
   }
 
   async init(...args) {
     const { devTools } = this.opts;
     await this.loadRendererEntry();
     devTools && this.openDevTool()
+  }
+
+  autoShow() {
+    this.win.once('ready-to-show', () => {
+      this.win.show();
+    })
   }
 
   /**

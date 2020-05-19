@@ -3,6 +3,7 @@ import {
   MenuModule,
   SetupConfigModule,
   MainBrowserWindowModule,
+  SetupLoadingBrowserWindowModule
 } from './internal-modules';
 import { ModuleRegister } from '@utils';
 import { Subject } from 'rxjs';
@@ -11,7 +12,18 @@ import { Subject } from 'rxjs';
  * 主入口
  */
 async function main() {
+  const setupLoadingWin = new BrowserWindow({...SetupLoadingBrowserWindowModule.winBaseConfig });
   const moduleRegister = new ModuleRegister(new Subject<[]>());
+  moduleRegister.tap(
+    new SetupLoadingBrowserWindowModule(
+      {
+        devTools: false,
+        isDev: __DEV__
+      },
+      setupLoadingWin
+    )
+  );
+  await moduleRegister.call();
   moduleRegister.tap(new SetupConfigModule());
   moduleRegister.tap(new MenuModule(), new MenuModule());
   moduleRegister.tap(
@@ -21,6 +33,7 @@ async function main() {
     })
   );
   await moduleRegister.call();
+  setupLoadingWin.close();
 }
 
 app.allowRendererProcessReuse = false;
