@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
 import Webview from '../webview';
+import { getConfigStream } from '@renderer/renderer-ipc-bus';
 import { Button } from 'antd';
-import '../../renderer-ipc-bus';
+import initConfig from '@config';
+import { useObservable } from 'rxjs-hooks';
+
 interface IProps {
 
 }
@@ -10,7 +13,8 @@ interface IProps {
 const Index: React.FC<IProps> = () => {
   const [count, setCount] = useState(0);
   const [tatalCount, setTatalCount] = useState(0);
-
+  const config = useObservable(getConfigStream, initConfig);
+  console.log('config -->', config)
   useEffect(() => {
     ipcRenderer.on('taskReady', (e, count) => {
       setCount(count);

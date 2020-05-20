@@ -1,11 +1,16 @@
 import * as IPC_KEYS from './ipc-keys';
 import { isNullOrUndefined } from 'util';
+import { Subject, Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
 
 type Map2Func<K extends keyof T, T> = (K extends any ? (arg1: K) => T[K]: never);
 type OmitReturnFunc<T extends (...args) => any> = T extends ((...args) => (...args) => any) ? never : T;
 type GetNotFuncKey<T, K extends keyof T> = Parameters<OmitReturnFunc<Map2Func<K, T>>>[number]
 type _INoFuncConfig<T extends any> = Pick<T, GetNotFuncKey<T, keyof T>>
 type INoFuncConfig = _INoFuncConfig<Config>
+
+const mutation$ = new Subject<INoFuncConfig>();
+const update$: Observable<INoFuncConfig> = mutation$.pipe(share());
 
 class Config {
   /** 输出日志目录 */
@@ -26,17 +31,9 @@ class Config {
    * @param key 更新指定字段的键
    * @param val 更新指定字段的值
    */
-  update<K extends keyof INoFuncConfig>(this: INoFuncConfig , key: K, val: INoFuncConfig[K]) {
+  update<K extends keyof INoFuncConfig>(this: INoFuncConfig, key: K, val: INoFuncConfig[K]) {
     this[key] = val;
-  }
-
-  /**
-   * 更新指定字段的 config
-   * @param key 更新指定字段的键
-   * @param val 更新指定字段的值
-   */
-  private update2<K extends keyof this>(key: K, val: this[K]) {
-    this[key] = val;
+    mutation$.next(this);
   }
 
   /**
@@ -47,6 +44,11 @@ class Config {
     newConfig && Object.keys(this).forEach(key => {
       if (!isNullOrUndefined(newConfig[key])) this[key] = newConfig[key];
     });
+    mutation$.next(this);
+  }
+
+  getUpdateStream() {
+    return update$
   }
 }
 export {

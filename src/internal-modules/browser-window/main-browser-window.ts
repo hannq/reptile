@@ -3,7 +3,7 @@ import { ipcMain, dialog, BrowserWindow, shell } from 'electron';
 import { logger, externalsHandler } from '@utils';
 import puppeteer from "puppeteer-core";
 import path from "path";
-import config from '@config';
+import config, { IPC_KEYS } from '@config';
 
 interface IOpts extends IBaseOpts {
 
@@ -18,8 +18,22 @@ export class MainBrowserWindowModule extends BaseBrowserWindowModule {
   }
 
   async init() {
+    this.emitConfigUpdate();
     await this.addIPCListener();
     await super.init();
+  }
+
+  /**
+   * config 更新时将最新的 config 发射出去
+   */
+  emitConfigUpdate() {
+    const update$ = config.getUpdateStream();
+    ipcMain.addListener(IPC_KEYS.CONFIT, () => {
+      this.win.webContents.send(IPC_KEYS.CONFIT, config);
+    })
+    update$.subscribe((config) => {
+      this.win.webContents.send(IPC_KEYS.CONFIT, config);
+    })
   }
 
   async addIPCListener () {

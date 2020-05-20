@@ -13,7 +13,8 @@ module.exports = (env) => {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: {
         '@config': path.join(paths.SOURCE_PATH, 'config/index'),
-        '@utils': path.join(paths.SOURCE_PATH, 'utils/index')
+        '@utils': path.join(paths.SOURCE_PATH, 'utils/index'),
+        '@renderer': path.join(paths.SOURCE_PATH, 'renderer'),
       }
     },
     module: {

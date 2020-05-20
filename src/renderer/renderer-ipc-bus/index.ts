@@ -1,3 +1,5 @@
-import { ipcRenderer } from 'electron';
+import { getConfigStream } from './config';
 
-
+export {
+  getConfigStream
+}
