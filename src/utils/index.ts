@@ -1,10 +1,15 @@
+import type { IModule, IModuleInitOutput } from './module-register';
 import logger from './logger';
 import externalsHandler from './externals-handler';
-import { ModuleRegister, IModule } from './module-register';
+import { ModuleRegister } from './module-register';
 
 export {
   logger,
   externalsHandler,
-  ModuleRegister,
-  IModule
+  ModuleRegister
+}
+
+export {
+  IModule,
+  IModuleInitOutput
 }

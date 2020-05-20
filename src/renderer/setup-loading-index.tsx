@@ -3,6 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Index from './views/setuo-loading';
+import './index.less';
 
 ReactDOM.render(<Index />, document.getElementById('app'));
 

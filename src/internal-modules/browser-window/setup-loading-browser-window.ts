@@ -11,17 +11,13 @@ interface IOpts extends IBaseOpts {
 
 export class SetupLoadingBrowserWindowModule extends BaseBrowserWindowModule {
   static winBaseConfig: BrowserWindowConstructorOptions = {
-    width: 380,
-    height: 140,
+    ...BaseBrowserWindowModule.winBaseConfig,
+    width: 120,
+    height: 120,
     frame: false,
-    show: false,
     hasShadow: true,
     transparent: true,
     resizable: false,
-    webPreferences: {
-      webviewTag: true,
-      nodeIntegration: true
-    },
   }
 
   static baseConfig: IBaseOpts  = {

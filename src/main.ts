@@ -1,3 +1,7 @@
+import type {
+  IModuleInitOutput,
+  IModule
+} from '@utils';
 import { app, BrowserWindow } from 'electron';
 import {
   MenuModule,
@@ -6,14 +10,13 @@ import {
   SetupLoadingBrowserWindowModule
 } from './internal-modules';
 import { ModuleRegister } from '@utils';
-import { Subject } from 'rxjs';
 
 /**
  * 主入口
  */
 async function main() {
   const setupLoadingWin = new BrowserWindow({...SetupLoadingBrowserWindowModule.winBaseConfig });
-  const moduleRegister = new ModuleRegister(new Subject<[]>());
+  const moduleRegister = new ModuleRegister();
   moduleRegister.tap(
     new SetupLoadingBrowserWindowModule(
       {

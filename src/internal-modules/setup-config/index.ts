@@ -13,10 +13,11 @@ export class SetupConfigModule implements IModule {
   $$name = 'SetupConfigModule';
 
   async init(...args) {
-    const CWD = process.cwd();
+    const APP_PATH = app.getAppPath();
+    /** 储存你应用程序设置文件 */
     const USER_DATA_PATH = app.getPath('userData');
     /** 用于注入 webview 中执行的脚本 */
-    const WEBVIEW_INJECTION = path.join(CWD, 'webview-injection');
+    const WEBVIEW_INJECTION = path.join(APP_PATH, 'webview-injection');
     /** 储存你应用程序设置文件的文件 */
     const USER_CONFIG_YAML = path.join(USER_DATA_PATH, 'CONFIG.yaml');
     // 确保指定文件存在防止报错
@@ -30,8 +31,8 @@ export class SetupConfigModule implements IModule {
       USER_CONFIG_YAML,
       ...externalConfig,
       LOG_PATH: logger.transports.file.getFile().path,
-      WEBVIEW_INJECTION
-    })
+      WEBVIEW_INJECTION,
+    });
     await this.checkChromeExec();
   }
 

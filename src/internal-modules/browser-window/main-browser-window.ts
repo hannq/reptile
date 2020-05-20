@@ -16,10 +16,12 @@ export class MainBrowserWindowModule extends BaseBrowserWindowModule {
   ) {
     super(opts, win);
   }
+
   async init() {
     await this.addIPCListener();
     await super.init();
   }
+
   async addIPCListener () {
     const win = this.win;
     ipcMain.addListener('screenshot132', async function (e, num: number = 10) {

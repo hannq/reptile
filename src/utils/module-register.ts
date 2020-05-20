@@ -2,7 +2,7 @@ import { Subject, from, asyncScheduler, Observable, ReplaySubject } from 'rxjs';
 import { switchMap, concatMap, tap, filter, share, groupBy, mergeMap, reduce } from 'rxjs/operators';
 import logger from './logger';
 
-type IModuleInitOutput = void;
+export type IModuleInitOutput = void;
 
 export interface IModule {
   /** 模块名称 */
@@ -26,28 +26,30 @@ export class ModuleRegister<S extends readonly any[]> {
   /** 内置日志记录工具 */
   private readonly logger = logger.scope('ModuleRegister');
   /** 模块 init 后的输出值 */
-  private output$: Observable<(readonly [IModule, IModuleInitOutput])[]>;
+  private readonly source$: Subject<S> = new Subject<S>();
+  /** 用于分发模块输处的流 */
+  private outputShare$: Observable<(readonly [IModule, IModuleInitOutput])[]>
   /** 分组计数 */
   private groupCount = 0;
   /** 用于标识结尾的虚构的模块 */
-  private fakeModule: IModule = {
-    $$name: 'FakeModule',
+  private guardModule: IModule = {
+    $$name: 'GuardModule',
     $$fake: true,
     $$groupId: Number.MAX_SAFE_INTEGER,
     init(){ }
   };
 
-
   constructor (
-    private readonly source$: Subject<S>
+    private readonly output$: Subject<(readonly [IModule, IModuleInitOutput])[]> = new Subject()
   ) {
-    this.output$ = this.init();
+    this.outputShare$ = this.init();
+    this.outputShare$.subscribe(this.output$);
   }
 
   init() {
     return this.source$.pipe(
       switchMap(() => from(
-        [...this.moduleList, this.fakeModule],
+        [...this.moduleList, this.guardModule],
         asyncScheduler
       ).pipe(
         filter(v => !v.$$loaded),
@@ -70,6 +72,11 @@ export class ModuleRegister<S extends readonly any[]> {
     )
   }
 
+  /** 正在加载的模块数量 */
+  get loadingModuleNum() {
+    return this.moduleList.filter(({$$loaded}) => !$$loaded).length;
+  }
+
   /**
    * 模块注册
    * @param module 需要被加载的模块
@@ -90,10 +97,10 @@ export class ModuleRegister<S extends readonly any[]> {
    */
   call<T extends S>(...args: T) {
     return new Promise<void>(resolve => {
-      const Subscription = this.output$.subscribe(([[module]]) => {
+      const subscription = this.outputShare$.subscribe(([[module]]) => {
         if (module.$$fake) {
           resolve();
-          Subscription.unsubscribe();
+          subscription.unsubscribe();
         }
       });
       this.source$.next(args);

@@ -54,7 +54,7 @@ module.exports = (env) => {
           chunks: ['setupLoading'],
           template: path.join(paths.STATIC_PATH, 'index.html'),
           filename: path.join(paths.DIST_PATH, 'setupLoading.html'),
-        })
+        }),
       ]
     }
   )
