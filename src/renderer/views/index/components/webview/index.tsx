@@ -4,6 +4,7 @@ import { useObservable } from 'rxjs-hooks';
 import fse from 'fs-extra';
 import path from 'path';
 import { getConfigStream } from '@renderer/renderer-ipc-bus';
+import './index.less';
 
 declare global {
 }
@@ -19,7 +20,7 @@ const Index: React.FC<IProps> = () => {
   useLayoutEffect(() => {
     if (config) {
       const script = fse.readFileSync(path.join(config.WEBVIEW_INJECTION, 'index.js'), 'utf8');
-      console.log('script ==>', script)
+      // console.log('script ==>', script)
       webviewRef.current.executeJavaScript(script);
       webviewRef.current.openDevTools();
     }
@@ -29,8 +30,8 @@ const Index: React.FC<IProps> = () => {
     <>
       <webview
         ref={webviewRef}
-        style={{ display: 'flex', width: 640, height: 480 }}
-        src="https://www.baidu.com"
+        className="webview"
+        src="https://cn.bing.com/?mkt=zh-CN&ensearch=1&FORM=BEHPTB"
       ></webview>
     </>
   )

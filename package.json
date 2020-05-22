@@ -66,6 +66,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.1.0",
     "antd": "^4.2.4",
     "bufferutil": "^4.0.1",
     "dayjs": "^1.8.26",
